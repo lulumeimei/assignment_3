@@ -1,16 +1,14 @@
-// src/app/api/users/[id]/route.js
-
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function GET(_, { params }) {
+export async function GET(_, context) {
     try {
-        const { id } = params;
+        const params = await context.params;
 
         const user = await prisma.user.findUnique({
-            where: { id: parseInt(id, 10) },
+            where: { id: parseInt(params.id, 10) },
         });
 
         if (!user) {
