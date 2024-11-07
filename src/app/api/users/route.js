@@ -8,13 +8,24 @@ import validator from 'validator';
 const prisma = new PrismaClient();
 
 // Handle GET requests to fetch users
-export async function GET() {
+export async function GET(request) {
     try {
-        const users = await prisma.user.findMany();
-        return NextResponse.json(users);
+        const { searchParams } = new URL(request.url);
+        const page = parseInt(searchParams.get('page') || '1', 10); // Default to page 1
+        const limit = parseInt(searchParams.get('limit') || '10', 10); // Default to 10 users per page
+        const skip = (page - 1) * limit;
+
+        const [users, total] = await Promise.all([
+            prisma.user.findMany({
+                skip,
+                take: limit,
+            }),
+            prisma.user.count(),
+        ]);
+
+        return NextResponse.json({ users, total });
     } catch (error) {
-        console.error("Error fetching users:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
 
