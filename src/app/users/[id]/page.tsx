@@ -6,11 +6,10 @@ import UserDetailClientComponent from "./UserDetailClientComponent";
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { id: string };
+export async function generateMetadata(props: {
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
+  const params = await props.params;
   try {
     const response = await fetch(`${API_BASE_URL}/api/users/${params.id}`, {
       cache: "no-store",
@@ -35,11 +34,10 @@ export async function generateMetadata({
   }
 }
 
-export default async function UserDetailPage({
-  params,
-}: {
-  params: { id: string };
+export default async function UserDetailPage(props: {
+  params: Promise<{ id: string }>;
 }) {
+  const params = await props.params;
   try {
     const response = await fetch(`${API_BASE_URL}/api/users/${params.id}`, {
       cache: "no-store",
