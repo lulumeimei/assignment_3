@@ -137,9 +137,9 @@ export async function PATCH(request) {
             return NextResponse.json({ error: 'Gender must be either Male or Female' }, { status: 400 });
         }
 
-        if (phoneNumber && !validator.isMobilePhone(phoneNumber, 'any')) {
-            return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 });
-        }
+        // if (phoneNumber && !validator.isMobilePhone(phoneNumber, 'any')) {
+        //     return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 });
+        // }
 
         // Check if the user exists
         const existingUser = await prisma.user.findUnique({
