@@ -15,19 +15,28 @@ export async function GET(request) {
         const limit = parseInt(searchParams.get('limit') || '10', 10); // Default to 10 users per page
         const skip = (page - 1) * limit;
 
+        // Retrieve order criteria from query parameters, default to ordering by 'id'
+        const orderByField = searchParams.get('orderBy') || 'id';
+        const orderDirection = searchParams.get('orderDirection') || 'desc'; // 'asc' or 'desc'
+
         const [users, total] = await Promise.all([
             prisma.user.findMany({
                 skip,
                 take: limit,
+                orderBy: {
+                    [orderByField]: orderDirection,
+                },
             }),
             prisma.user.count(),
         ]);
 
         return NextResponse.json({ users, total });
     } catch (error) {
+        console.error('Error fetching users:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
 
 // Handle POST requests to create a new user
 export async function POST(request) {

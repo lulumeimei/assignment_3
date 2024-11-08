@@ -42,13 +42,24 @@ export default function UsersPage() {
   };
 
   const handleRowClick = (userId: number) => {
-    // Navigate to a user detail page or perform another action
     router.push(`/users/${userId}`);
+  };
+
+  const handleCreateUser = () => {
+    router.push("/users/create");
   };
 
   return (
     <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">User List</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-xl font-bold">User List</h1>
+        <button
+          onClick={handleCreateUser}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-400 dark:hover:bg-blue-500"
+        >
+          Create User
+        </button>
+      </div>
       <table className="min-w-full border border-gray-200">
         <thead className="bg-gray-100 dark:bg-gray-800">
           <tr>
