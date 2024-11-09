@@ -1,19 +1,21 @@
 // src/components/Header.tsx
 
+import Link from "next/link";
+
 export default function Header() {
   return (
     <header className="bg-gray-800 text-white p-4">
       <nav>
         <ul className="flex space-x-4">
           <li>
-            <a href="/" className="hover:underline">
+            <Link href="/" className="hover:underline">
               Home
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/users" className="hover:underline">
+            <Link href="/users" className="hover:underline">
               Users
-            </a>
+            </Link>
           </li>
         </ul>
       </nav>

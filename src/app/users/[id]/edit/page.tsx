@@ -38,6 +38,7 @@ export default function EditUserPage({
         setUser(data);
       } catch (err) {
         setError("Failed to load user data");
+        console.log(err);
       } finally {
         setLoading(false);
       }
@@ -53,6 +54,7 @@ export default function EditUserPage({
       router.replace(`/users/${updatedUser.id}`);
       router.refresh();
     } catch (err) {
+      console.log(err);
       setError("Failed to update user");
     }
   };
