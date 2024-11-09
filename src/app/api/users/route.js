@@ -136,6 +136,7 @@ export async function PATCH(request) {
     try {
         const body = await request.json();
         const { email, firstName, lastName, gender, phoneNumber } = body;
+        console.log('body', body);
 
         // Validate the input
         if (!email || !validator.isEmail(email)) {
@@ -164,7 +165,7 @@ export async function PATCH(request) {
             where: { email },
             data: {
                 firstName: firstName || existingUser.firstName,
-                lastName: lastName || existingUser.lastName,
+                lastName: lastName,
                 gender: gender ? gender.toUpperCase() : existingUser.gender,
                 phoneNumber: phoneNumber || existingUser.phoneNumber,
             },

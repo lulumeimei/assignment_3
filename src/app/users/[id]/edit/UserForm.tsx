@@ -1,4 +1,3 @@
-// src/app/users/[id]/edit/UserForm.tsx
 import { User } from "@/types/user";
 import { useState } from "react";
 
@@ -10,17 +9,34 @@ export default function UserForm({
   onSubmit: (user: User) => void;
 }) {
   const [formData, setFormData] = useState(user);
+  const [phoneError, setPhoneError] = useState("");
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
+
+    // Validate phone number if it's being changed
+    if (name === "phoneNumber") {
+      validatePhoneNumber(value);
+    }
+  };
+
+  const validatePhoneNumber = (phoneNumber: string) => {
+    const phoneRegex = /^[0-9]{10}$/; // Example regex for a 10-digit phone number
+    if (!phoneRegex.test(phoneNumber)) {
+      setPhoneError("Please enter a valid 10-digit phone number.");
+    } else {
+      setPhoneError("");
+    }
   };
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    onSubmit(formData);
+    if (!phoneError) {
+      onSubmit(formData);
+    }
   };
 
   return (
@@ -47,7 +63,6 @@ export default function UserForm({
           name="lastName"
           value={formData.lastName}
           onChange={handleChange}
-          required
           className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
         />
       </div>
@@ -91,6 +106,9 @@ export default function UserForm({
           required
           className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
         />
+        {phoneError && (
+          <p className="text-red-500 text-sm mt-1">{phoneError}</p>
+        )}
       </div>
       <div className="flex justify-end">
         <button
