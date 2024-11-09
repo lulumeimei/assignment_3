@@ -135,7 +135,7 @@ export async function DELETE(request) {
 export async function PATCH(request) {
     try {
         const body = await request.json();
-        const { email, firstName, lastName, gender, phoneNumber } = body;
+        const { email, firstName, lastName, gender, phoneNumber, password } = body;
         console.log('body', body);
 
         // Validate the input
@@ -168,6 +168,7 @@ export async function PATCH(request) {
                 lastName: lastName,
                 gender: gender ? gender.toUpperCase() : existingUser.gender,
                 phoneNumber: phoneNumber || existingUser.phoneNumber,
+                password: password || existingUser.password,
             },
         });
 

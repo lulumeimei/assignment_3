@@ -10,6 +10,15 @@ export default function UserForm({
 }) {
   const [formData, setFormData] = useState(user);
   const [phoneError, setPhoneError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [existingPassword, setExistingPassword] = useState<string>(
+    user?.password || ""
+  );
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [isExistingPasswordVisible, setIsExistingPasswordVisible] =
+    useState<boolean>(false);
+  const [isNewPasswordVisible, setIsNewPasswordVisible] =
+    useState<boolean>(false);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -20,6 +29,11 @@ export default function UserForm({
     // Validate phone number if it's being changed
     if (name === "phoneNumber") {
       validatePhoneNumber(value);
+    }
+
+    // Validate password if it's being changed
+    if (name === "password") {
+      validatePassword(value);
     }
   };
 
@@ -32,11 +46,39 @@ export default function UserForm({
     }
   };
 
+  const validatePassword = (password: string) => {
+    // Password must:
+    // - Be at least 8 characters long
+    // - Include at least one uppercase letter
+    // - Include at least one lowercase letter
+    // - Include at least one digit
+    // - Include at least one special character from the set [@#$%^&+=!]
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      console.log("Password does not meet criteria");
+      setPasswordError(
+        "Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character."
+      );
+    } else {
+      setPasswordError("");
+    }
+  };
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!phoneError) {
+    if (!phoneError && !passwordError) {
       onSubmit(formData);
     }
+  };
+
+  const toggleExistingPasswordVisibility = () => {
+    setIsExistingPasswordVisible((prevState) => !prevState);
+  };
+
+  const toggleNewPasswordVisibility = () => {
+    setIsNewPasswordVisible((prevState) => !prevState);
   };
 
   return (
@@ -108,6 +150,56 @@ export default function UserForm({
         />
         {phoneError && (
           <p className="text-red-500 text-sm mt-1">{phoneError}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Existing Password
+        </label>
+        <div className="flex items-center">
+          <input
+            type={isExistingPasswordVisible ? "text" : "password"}
+            value={existingPassword}
+            name="existingPassword"
+            readOnly={true}
+            onChange={(e) => setExistingPassword(e.target.value)}
+            className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          />
+          <button
+            type="button"
+            onClick={toggleExistingPasswordVisibility}
+            className="ml-2 px-2 py-1 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded"
+          >
+            {isExistingPasswordVisible ? "Hide" : "Show"}
+          </button>
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          New Password
+        </label>
+        <div className="flex items-center">
+          <input
+            type={isNewPasswordVisible ? "text" : "password"}
+            name="password"
+            value={newPassword}
+            onChange={(e) => {
+              setNewPassword(e.target.value);
+              handleChange(e);
+            }}
+            placeholder="Enter new password"
+            className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          />
+          <button
+            type="button"
+            onClick={toggleNewPasswordVisibility}
+            className="ml-2 px-2 py-1 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded"
+          >
+            {isNewPasswordVisible ? "Hide" : "Show"}
+          </button>
+        </div>
+        {passwordError && (
+          <p className="text-red-500 text-sm mt-1">{passwordError}</p>
         )}
       </div>
       <div className="flex justify-end">
