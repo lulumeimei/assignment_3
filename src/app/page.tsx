@@ -19,7 +19,13 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image src="/github.svg" alt="GitHub logo" width={20} height={20} />
+            <Image
+              src="/github.svg"
+              alt="GitHub logo"
+              width={20}
+              height={20}
+              className="invert dark:invert-0"
+            />
             GitHub Repo
           </Link>
           <Link
