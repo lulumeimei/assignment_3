@@ -16,6 +16,7 @@ async function main() {
                 email: faker.internet.email(),
                 gender: faker.helpers.arrayElement(['MALE', 'FEMALE']),
                 phoneNumber: faker.phone.number('###-###-####'),
+                password: faker.internet.password(),
             },
         });
     });

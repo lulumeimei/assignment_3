@@ -20,4 +20,5 @@ model User {
   email       String @unique
   gender      String
   phoneNumber String
+  password    String @default("")
 }
