@@ -2,15 +2,48 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 
+async function fetchUserById(id: string): Promise<User | null> {
+  try {
+    const response = await fetch(`/api/users/${id}`);
+    if (!response.ok) {
+      throw new Error("User not found");
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Failed to fetch user:", error);
+    return null;
+  }
+}
+
 export default function UserDetailClientComponent({
-  user,
+  user: initialUser,
 }: {
   user: User | null;
 }) {
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(initialUser);
+
+  const refreshUserData = async (id: string) => {
+    const updatedUser = await fetchUserById(id);
+    setUser(updatedUser);
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (user?.id) {
+        refreshUserData(user.id.toString());
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [user]);
 
   if (!user) {
     return (
@@ -32,12 +65,14 @@ export default function UserDetailClientComponent({
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
             {user.firstName} {user.lastName}
           </h2>
-          <Link
-            href={`/users/${user.id}/edit`}
-            className="text-blue-600 dark:text-blue-400 hover:underline"
+          <button
+            onClick={async () => {
+              router.replace(`/users/${user.id}/edit`);
+            }}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-400 dark:hover:bg-blue-500"
           >
             Edit
-          </Link>
+          </button>
         </div>
         <div className="text-gray-700 dark:text-gray-300">
           <p>

@@ -15,7 +15,7 @@ export default function EditUserPage({
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
     null
   );
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -49,7 +49,9 @@ export default function EditUserPage({
   const handleSubmit = async (updatedUser: User) => {
     try {
       await updateUser(updatedUser);
-      router.push(`/users/${updatedUser.id}`);
+      // router.replace(`/users/${updatedUser.id}`); // Use replace to avoid adding a new entry
+      router.replace(`/users/${updatedUser.id}`);
+      router.refresh();
     } catch (err) {
       setError("Failed to update user");
     }

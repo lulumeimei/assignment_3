@@ -3,41 +3,61 @@
 
 import { User } from "@/types/user";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const usersPerPage = 10;
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialPage = parseInt(searchParams.get("page") || "1", 10);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+
+  const fetchUsers = async (page: number) => {
+    try {
+      const response = await fetch(
+        `/api/users?page=${page}&limit=${usersPerPage}`
+      );
+      const data = await response.json();
+      setUsers(data.users);
+      setTotalPages(Math.ceil(data.total / usersPerPage));
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch(
-          `/api/users?page=${currentPage}&limit=${usersPerPage}`
-        );
-        const data = await response.json();
-        setUsers(data.users);
-        setTotalPages(Math.ceil(data.total / usersPerPage));
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      }
+    fetchUsers(currentPage);
+  }, [currentPage]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const currentPageFromURL = parseInt(searchParams.get("page") || "1", 10);
+      setCurrentPage(currentPageFromURL);
+      fetchUsers(currentPageFromURL);
     };
 
-    fetchUsers();
-  }, [currentPage]);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [searchParams]);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+      router.push(`/users?page=${newPage}`);
     }
   };
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+      router.push(`/users?page=${newPage}`);
     }
   };
 
