@@ -13,6 +13,7 @@ interface User {
   email: string;
   gender: string;
   phoneNumber: string;
+  password?: string; // Add password to the User interface
 }
 
 export default function CreateUserForm() {
@@ -22,7 +23,10 @@ export default function CreateUserForm() {
     email: "",
     gender: "",
     phoneNumber: "",
+    password: "",
   });
+  const [passwordError, setPasswordError] = useState<string>("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const router = useRouter();
 
   const handleChange = (
@@ -30,10 +34,31 @@ export default function CreateUserForm() {
   ) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
+
+    if (name === "password") {
+      validatePassword(value);
+    }
+  };
+
+  const validatePassword = (password: string) => {
+    // Password must be at least 8 characters long, include an uppercase letter, and a special character
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setPasswordError(
+        "Password must be at least 8 characters long, include an uppercase letter, and a special character."
+      );
+    } else {
+      setPasswordError("");
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    if (passwordError) {
+      toast.error("Please fix the password error before submitting.");
+      return;
+    }
 
     try {
       const response = await fetch("/api/users", {
@@ -57,6 +82,10 @@ export default function CreateUserForm() {
 
   const handleBack = () => {
     router.back(); // Navigate back to the previous page
+  };
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible((prevState) => !prevState);
   };
 
   return (
@@ -128,6 +157,32 @@ export default function CreateUserForm() {
           required
           className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
         />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Password
+        </label>
+        <div className="flex items-center">
+          <input
+            type={isPasswordVisible ? "text" : "password"}
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            placeholder="Enter password"
+            className="mt-1 block w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+          />
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="ml-2 px-2 py-1 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded"
+          >
+            {isPasswordVisible ? "Hide" : "Show"}
+          </button>
+        </div>
+        {passwordError && (
+          <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+        )}
       </div>
       <div className="flex justify-between">
         <button

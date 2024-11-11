@@ -42,7 +42,7 @@ export async function GET(request) {
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { firstName, lastName, email, gender, phoneNumber } = body;
+        const { firstName, lastName, email, gender, phoneNumber, password } = body;
 
         // Validate the user input
         const errors = [];
@@ -67,6 +67,10 @@ export async function POST(request) {
             errors.push('Invalid or missing phone number');
         }
 
+        if (!password || typeof password !== 'string') {
+            errors.push('Invalid or missing password');
+        }
+
         if (errors.length > 0) {
             return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
         }
@@ -88,6 +92,7 @@ export async function POST(request) {
                 email,
                 gender: gender.toUpperCase(),
                 phoneNumber,
+                password,
             },
         });
 
